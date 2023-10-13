@@ -41,7 +41,7 @@ namespace Agoo.Events
 
         public void AddListener(Action call, AgEventTracker tracker = null)
         {
-            var unityAction = (UnityAction<T1>)Delegate.CreateDelegate(typeof(UnityAction<T1>), call.Target, call.Method);
+            var unityAction = (UnityAction<T1>)Delegate.CreateDelegate(typeof(UnityAction), call.Target, call.Method);
             _unityEvent?.AddListener(unityAction, tracker);
         }
 

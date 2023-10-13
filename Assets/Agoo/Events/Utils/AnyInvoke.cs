@@ -9,39 +9,32 @@ namespace Agoo.Events
     public class AnyInvoke : AgEvent
     {
         private IEnumerable<IAgEvent> _events;
+        private readonly AgEventTracker _agEventTracker = new();
 
         public AnyInvoke(params IAgEvent[] events)
         {
-            SetSubEvents(events);
+            AddListeners(events);
         }
 
         public AnyInvoke(IEnumerable<IAgEvent> events)
         {
-            SetSubEvents(events);
+            AddListeners(events);
         }
 
-        private void SetSubEvents(IEnumerable<IAgEvent> events)
+        ~AnyInvoke()
+        {
+            _agEventTracker.RemoveAllListeners();
+        }
+
+        private void AddListeners(IEnumerable<IAgEvent> events)
         {
             _events = events;
 
             if (_events != null) {
                 foreach (var evt in _events) {
-                    evt?.AddListener(Invoke);
+                    evt?.AddListener(Invoke, _agEventTracker);
                 }
             }
-        }
-
-        public override void RemoveAllListeners()
-        {
-            if (_events != null) {
-                foreach (var evt in _events) {
-                    evt?.RemoveListener(Invoke);
-                }
-
-                _events = null;
-            }
-
-            base.RemoveAllListeners();
         }
     }
 }
