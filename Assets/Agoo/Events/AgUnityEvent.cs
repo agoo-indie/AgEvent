@@ -14,14 +14,12 @@ namespace Agoo.Events
 
         public void AddListener(Action call, AgEventTracker tracker = null)
         {
-            var unityAction = (UnityAction)Delegate.CreateDelegate(typeof(UnityAction), call.Target, call.Method);
-            _unityEvent?.AddListener(unityAction, tracker);
+            _unityEvent?.AddListener(call.Invoke, tracker);
         }
 
         public void RemoveListener(Action call)
         {
-            var unityAction = (UnityAction)Delegate.CreateDelegate(typeof(UnityAction), call.Target, call.Method);
-            _unityEvent?.RemoveListener(unityAction);
+            throw new NotImplementedException("Not support! Use AgEventTracker instead.");
         }
 
         public void RemoveAllListeners()
@@ -41,14 +39,12 @@ namespace Agoo.Events
 
         public void AddListener(Action call, AgEventTracker tracker = null)
         {
-            var unityAction = (UnityAction<T1>)Delegate.CreateDelegate(typeof(UnityAction), call.Target, call.Method);
-            _unityEvent?.AddListener(unityAction, tracker);
+            _unityEvent?.AddListener(_ => call.Invoke(), tracker);
         }
 
         public void RemoveListener(Action call)
         {
-            var unityAction = (UnityAction<T1>)Delegate.CreateDelegate(typeof(UnityAction<T1>), call.Target, call.Method);
-            _unityEvent?.RemoveListener(unityAction);
+            throw new NotImplementedException("Not support! Use AgEventTracker instead.");
         }
 
         public void RemoveAllListeners()

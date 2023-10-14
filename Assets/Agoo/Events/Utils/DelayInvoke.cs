@@ -9,32 +9,24 @@ namespace Agoo.Events
     /// </summary>
     public class DelayInvoke : AgEvent
     {
-        private bool _isDirty;
-        private IAgEvent _target;
-
         #region Updater
 
         private class Updater : MonoBehaviour
         {
-            private readonly List<DelayInvoke> _delayInvokeList = new();
+            private readonly HashSet<DelayInvoke> _delayInvokeList = new();
 
             public void Add(DelayInvoke delayInvoke)
             {
                 _delayInvokeList.Add(delayInvoke);
             }
 
-            public void Remove(DelayInvoke delayInvoke)
-            {
-                _delayInvokeList.Remove(delayInvoke);
-            }
-
-            private void Update()
+            private void LateUpdate()
             {
                 foreach (var delayInvoke in _delayInvokeList) {
-                    if (delayInvoke._isDirty) {
-                        delayInvoke.DoInvoke();
-                    }
+                    delayInvoke.Invoke();
                 }
+
+                _delayInvokeList.Clear();
             }
         }
 
@@ -54,34 +46,22 @@ namespace Agoo.Events
 
         #endregion
 
+        private readonly AgEventTracker _eventTracker = new();
+
         public DelayInvoke(IAgEvent evt)
         {
-            _target = evt;
-            _target.AddListener(MarkDirty);
-
-            GetUpdater().Add(this);
+            evt.AddListener(MarkDirty, _eventTracker);
         }
 
-        public override void RemoveAllListeners()
+        ~DelayInvoke()
         {
-            _target.RemoveListener(MarkDirty);
-            _target = null;
-
-            GetUpdater().Remove(this);
-
-            base.RemoveAllListeners();
+            _eventTracker.RemoveAllListeners();
+            Debug.Log("~AnyInvoke");
         }
 
         private void MarkDirty()
         {
-            _isDirty = true;
-        }
-
-        private void DoInvoke()
-        {
-            _isDirty = false;
-
-            Invoke();
+            GetUpdater().Add(this);
         }
     }
 }
